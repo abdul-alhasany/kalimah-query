@@ -1,8 +1,3 @@
-// https://j11y.io/javascript/extending-jquerys-selector-capabilities/
-// http://benalman.com/news/2010/03/jquery-special-events/
-//http://stackoverflow.com/a/5490021/529024
-// http://www.jameswiseman.com/blog/2010/04/19/creating-a-jquery-custom-selector/
-
 // Check whether element is currently within the viewport:
 $.extend($.expr[':'], {
 	'inViewFull' : function (elem) {
@@ -175,6 +170,32 @@ $.map(
 		}
 	};
 });
+
+
+/* inView Events */
+var views = ['inView', 'inViewFull'];
+$.map(
+  views,
+  function(event_name) {
+    $.event.special[event_name] = {
+      delegateType: "scroll",
+      bindType: "scroll",
+      handle: function(event) {
+        var handleObj = event.handleObj;
+        var targetData = jQuery.data(event.target);
+        var ret = null;
+
+        var element = event.data.selector;
+      
+        if (jQuery(element + ":" + event_name).length > 0) {
+          event.type = handleObj.origType;
+          ret = handleObj.handler.apply(this, arguments);
+          event.type = handleObj.type;
+          return ret;
+        }
+      }
+    }
+  });
 
 /* Functions */
 jQuery.fn.firstWord = function () {
